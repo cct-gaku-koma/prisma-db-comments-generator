@@ -24,9 +24,16 @@ import {
   Target,
 } from "./comment";
 import { parse } from "./parser";
+import { parseMultiSchemaModels } from "./parserMultiSchema";
 import { generateCommentStatements } from "./statement";
 
-const generate = async ({ generator, dmmf, schemaPath }: GeneratorOptions) => {
+const generate = async ({
+  generator,
+  dmmf,
+  schemaPath,
+  datamodel,
+  otherGenerators,
+}: GeneratorOptions) => {
   const outputDir = parseEnvValue(generator.output as EnvValue);
   await fs.mkdir(outputDir, { recursive: true });
 
@@ -51,7 +58,16 @@ const generate = async ({ generator, dmmf, schemaPath }: GeneratorOptions) => {
       generator.config.includeEnumInFieldComment === "true";
   }
 
-  const models = parse(dmmf.datamodel);
+  let models = parse(dmmf.datamodel);
+  // Extend model table names with schema names if using multiSchema
+  if (
+    otherGenerators
+      .find((gen) => gen.name === "client")
+      ?.previewFeatures?.includes("multiSchema")
+  ) {
+    models = parseMultiSchemaModels(models, datamodel);
+  }
+
   const currentComments = createComments(
     models,
     targets,

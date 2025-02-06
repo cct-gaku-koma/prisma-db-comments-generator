@@ -1,6 +1,6 @@
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["views"]
+  previewFeatures = ["multiSchema", "views"]
 }
 
 generator comments {
@@ -12,6 +12,7 @@ generator comments {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  schemas  = ["public", "extend"]
 }
 
 /// Product type enumeration
@@ -21,6 +22,7 @@ enum ProductType {
   FASHION
 
   @@map("enum_product_type")
+  @@schema("public")
 }
 
 /// Customer
@@ -35,6 +37,7 @@ model Customer {
   sales      Sale[]
 
   @@map("customers")
+  @@schema("public")
 }
 
 /// Product
@@ -53,6 +56,7 @@ model Product {
   sales       Sale[]
 
   @@map("products")
+  @@schema("public")
 }
 
 model Sale {
@@ -71,6 +75,7 @@ model Sale {
   createdAt  DateTime @default(dbgenerated("statement_timestamp()")) @map("created_at") @db.Timestamptz()
 
   @@map("sales")
+  @@schema("public")
 }
 
 /// Customer Sale Summary View
@@ -83,4 +88,18 @@ view CustomerSaleSummaryView {
   totalPurchasePrice Int    @map("total_purchase_price")
 
   @@map("customer_sale_summaries_view")
+  @@schema("public")
+}
+
+/// Store
+model Store {
+  /// Store ID
+  storeId Int    @id @map("store_id")
+  /// Store Name
+  name    String
+  /// Total
+  address String
+
+  @@map("store")
+  @@schema("extend")
 }
