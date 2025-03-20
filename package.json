@@ -50,6 +50,7 @@
     "typescript-eslint": "^7.18.0"
   },
   "dependencies": {
+    "@mrleebo/prisma-ast": "^0.12.1",
     "@prisma/generator-helper": "^5.0.0",
     "@prisma/internals": "^5.0.0"
   }

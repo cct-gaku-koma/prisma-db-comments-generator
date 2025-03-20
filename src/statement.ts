@@ -6,11 +6,17 @@ export const generateCommentStatements = (comments: Comments): string[] => {
   for (const tableName in comments) {
     const { table, columns } = comments[tableName];
 
+    const convertQuotedIdentifier = (name: string) =>
+      name
+        .split(".")
+        .map((n) => `"${n}"`)
+        .join(".");
+
     commentStatements.push(`-- ${tableName} comments`);
     if (table) {
       // ON TABLE
       commentStatements.push(
-        `COMMENT ON TABLE "${table.tableName}" IS ${commentValue(table.comment)};`,
+        `COMMENT ON TABLE ${convertQuotedIdentifier(table.tableName)} IS ${commentValue(table.comment)};`,
       );
     }
 
@@ -18,7 +24,7 @@ export const generateCommentStatements = (comments: Comments): string[] => {
       for (const column of columns) {
         // ON COLUMN
         commentStatements.push(
-          `COMMENT ON COLUMN "${column.tableName}"."${column.columnName}" IS ${commentValue(column.comment)};`,
+          `COMMENT ON COLUMN ${convertQuotedIdentifier(`${column.tableName}.${column.columnName}`)} IS ${commentValue(column.comment)};`,
         );
       }
     }
